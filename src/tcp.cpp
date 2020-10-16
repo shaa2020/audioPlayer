@@ -4,8 +4,15 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <netinet/in.h>
+#include <sys/select.h>
 #include "tcp.h"
+#include <unistd.h>
 
+/**********************************************************************
+ *	Function section started
+ * ********************************************************************/
 
 int tcp_connect(struct tcp_socket *sock) {
 	sock->fd = socket(AF_INET,SOCK_STREAM,0); // socket(ip version, connection type , prototype)
@@ -29,7 +36,31 @@ int tcp_connect(struct tcp_socket* sock,int port, char* hostname) {
 	struct hostent *host;
 
 	if (!sock)
-		return TCP_ERROR;
+		return TCP_PARAM_ERROR;
 	if (!hostname)
+		return TCP_PARAM_ERROR;
+
+	if (sock->fd < 0)
 		return TCP_ERROR;
+	host = gethostbyname(hostname);
+	
+	addr.sin_addr.s_addr = *(unsigned long*)host->h_addr_list[0];
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons((unsigned short)port);
+	
+	if (connect(sock->fd, (struct sockaddr* )&addr,sizeof(addr)))
+		return TCP_CONNECT_ERROR;
+
+	return TCP_SUCCESS;
+}
+
+int tcp_send(struct tcp_socket* sock, char* buffer, int size) {
+	if (!sock)
+		return TCP_PARAM_ERROR;
+	if (sock->fd == -1)
+		return TCP_ERROR;
+	if(write(sock->fd,buffer,size) < 0) {
+		return TCP_ERROR;
+	}
+	return TCP_SUCCESS;
 }

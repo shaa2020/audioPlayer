@@ -7,6 +7,7 @@ struct tcp_socket {
 #define TCP_ERROR -102
 #define TCP_SUCCESS 102
 #define TCP_PARAM_ERROR -103
+#define TCP_CONNECT_ERROR -104
 
 int tcp_connect(struct tcp_socket *sock);
 int tcp_close(struct tcp_socket *sock);
