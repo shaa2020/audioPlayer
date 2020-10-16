@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <sys/select.h>
 #include "tcp.h"
+#include <netdb.h>
 #include <unistd.h>
 
 /**********************************************************************
@@ -63,4 +64,28 @@ int tcp_send(struct tcp_socket* sock, char* buffer, int size) {
 		return TCP_ERROR;
 	}
 	return TCP_SUCCESS;
+}
+
+int tcp_recv(struct tcp_socket* sock,char* buffer,int *size,int buffer_size) {
+	ssize_t rxsize;
+	int errcode;
+
+	if (!sock)
+		return TCP_PARAM_ERROR;
+
+	if (!size)
+		return TCP_PARAM_ERROR;
+
+	if (sock->fd == -1)
+		return TCP_ERROR;
+
+	if (buffer_size == 0)
+		return TCP_PARAM_ERROR;
+
+	rxsize = read(sock->fd,buffer, buffer_size);
+	errcode = errno; // errno is automatically filled by read() function
+	*size = (int)rxsize;
+
+	return TCP_SUCCESS;
+	
 }
