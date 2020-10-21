@@ -60,7 +60,7 @@ int tcp_send(struct tcp_socket* sock, char* buffer, int size) {
 		return TCP_PARAM_ERROR;
 	if (sock->fd == -1)
 		return TCP_ERROR;
-	if(write(sock->fd,buffer,size) < 0) {
+	if (write(sock->fd,buffer,size) < 0) {
 		return TCP_ERROR;
 	}
 	return TCP_SUCCESS;
